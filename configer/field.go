@@ -54,8 +54,8 @@ const (
 	FieldTypeSection
 )
 
-// ConfigField is a configuration field.
-type ConfigField struct {
+// Field is a configuration field.
+type Field struct {
 	Type  FieldType
 	Value any
 }

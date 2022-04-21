@@ -99,13 +99,13 @@ type FileConfiguration interface {
 	// SetReloadStrategy set reloading strategy
 	SetReloadStrategy(strategy ReloadingStrategy)
 	// GetEncoder returns the configuration encoder
-	GetEncoder() ConfigEncoder
+	GetEncoder() Encoder
 	// GetDecoder returns the configuration decoder
-	GetDecoder() ConfigDecoder
+	GetDecoder() Decoder
 	// SetEncoder sets the configuration encoder
-	SetEncoder(encoder ConfigEncoder)
+	SetEncoder(encoder Encoder)
 	// SetDecoder sets the configuration decoder
-	SetDecoder(decoder ConfigDecoder)
+	SetDecoder(decoder Decoder)
 }
 
 // ReloadingStrategy file configuration reloading strategy
@@ -120,22 +120,22 @@ type ReloadingStrategy interface {
 	ReloadingPerformed() error
 }
 
-// ConfigCodec is the configuration codec interface
-type ConfigCodec interface {
+// Codec is the configuration codec interface
+type Codec interface {
 	// ConfigEncoder encodes the configuration
-	ConfigEncoder
+	Encoder
 	// ConfigDecoder decodes the configuration
-	ConfigDecoder
+	Decoder
 }
 
-// ConfigDecoder is the interface that wraps the Encode method.
-type ConfigDecoder interface {
+// Decoder is the interface that wraps the Encode method.
+type Decoder interface {
 	// Decode decodes the configuration from the given bytes.
-	Decode(bytes []byte) (map[string]ConfigField, error)
+	Decode(bytes []byte) (map[string]Field, error)
 }
 
-// ConfigEncoder is the interface that wraps the Decode method.
-type ConfigEncoder interface {
+// Encoder is the interface that wraps the Decode method.
+type Encoder interface {
 	// Encode encodes the configuration to bytes.
-	Encode(configMap map[string]ConfigField) ([]byte, error)
+	Encode(configMap map[string]Field) ([]byte, error)
 }
