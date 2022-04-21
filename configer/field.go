@@ -1,5 +1,9 @@
 package configer
 
+import (
+	"time"
+)
+
 // FiledType custom field type
 type FieldType uint8
 
@@ -58,4 +62,64 @@ const (
 type Field struct {
 	Type  FieldType
 	Value any
+}
+
+// Atof convert any to Field
+func Atof(value any) Field {
+	switch value := value.(type) {
+	case Field:
+		return value
+	case string:
+		return Field{Type: FieldTypeString, Value: value}
+	case []string:
+		return Field{Type: FieldTypeStringSlice, Value: value}
+	case bool:
+		return Field{Type: FieldTypeBool, Value: value}
+	case []bool:
+		return Field{Type: FieldTypeBoolSlice, Value: value}
+	case int:
+		return Field{Type: FieldTypeInt, Value: value}
+	case []int:
+		return Field{Type: FieldTypeIntSlice, Value: value}
+	case int32:
+		return Field{Type: FieldTypeInt32, Value: value}
+	case []int32:
+		return Field{Type: FieldTypeInt32Slice, Value: value}
+	case int64:
+		return Field{Type: FieldTypeInt64, Value: value}
+	case []int64:
+		return Field{Type: FieldTypeInt64Slice, Value: value}
+	case uint:
+		return Field{Type: FieldTypeUint, Value: value}
+	case []uint:
+		return Field{Type: FieldTypeUintSlice, Value: value}
+	case uint32:
+		return Field{Type: FieldTypeUint32, Value: value}
+	case []uint32:
+		return Field{Type: FieldTypeUint32Slice, Value: value}
+	case uint64:
+		return Field{Type: FieldTypeUint64, Value: value}
+	case []uint64:
+		return Field{Type: FieldTypeUint64Slice, Value: value}
+	case float32:
+		return Field{Type: FieldTypeFloat32, Value: value}
+	case []float32:
+		return Field{Type: FieldTypeFloat32Slice, Value: value}
+	case float64:
+		return Field{Type: FieldTypeFloat64, Value: value}
+	case []float64:
+		return Field{Type: FieldTypeFloat64Slice, Value: value}
+	case time.Duration:
+		return Field{Type: FieldTypeDuration, Value: value}
+	case time.Time:
+		return Field{Type: FieldTypeTime, Value: value}
+	case map[string]interface{}:
+		subMap := make(map[string]Field)
+		for key, value := range value {
+			subMap[key] = Atof(value)
+		}
+		return Field{Type: FieldTypeSection, Value: subMap}
+	default:
+		return Field{Type: FiledTypeUnknown, Value: value}
+	}
 }
