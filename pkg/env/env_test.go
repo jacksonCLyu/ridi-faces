@@ -4,12 +4,12 @@ import "testing"
 
 func TestGetInfo(t *testing.T) {
 	info := GetInfo()
-	if info.EnvType != Local {
+	if info.envType != Local {
 		t.Errorf("env.GetInfo().EnvType != Local")
 	}
-	if info.AppRootPath == "" {
+	if info.appRootPath == "" {
 		t.Errorf("env.GetInfo().AppRootPath == \"\"")
 	} else {
-		t.Logf("env.GetInfo().AppRootPath = %s", info.AppRootPath)
+		t.Logf("env.GetInfo().AppRootPath = %s", info.appRootPath)
 	}
 }

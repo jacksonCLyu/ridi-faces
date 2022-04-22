@@ -31,59 +31,59 @@ const (
 	K8s
 )
 
-// Info is a struct that contains the environment information.
-type Info struct {
+// info is a struct that contains the environment information.
+type info struct {
 	// once is used to ensure that the environment is only set once.
 	once sync.Once
-	// EnvType is the type of the environment.
-	EnvType Env
-	// AppRootPath is the home directory of the application context.
-	AppRootPath string
-	// Context for extra
-	Context context.Context
+	// envType is the type of the environment.
+	envType Env
+	// appRootPath is the home directory of the application context.
+	appRootPath string
+	// context for extra
+	context context.Context
 }
 
-var env = &Info{Context: context.Background()}
+var env = &info{context: context.Background()}
 
 // GetInfo returns the environment information.
-func GetInfo() *Info {
+func GetInfo() *info {
 	ensure()
 	return env
 }
 
 // IsLocal is local environment
 func IsLocal() bool {
-	return GetInfo().EnvType == Local
+	return GetInfo().envType == Local
 }
 
 // IsDev is development environment
 func IsDev() bool {
-	return GetInfo().EnvType == Dev
+	return GetInfo().envType == Dev
 }
 
 // IsTest is test environment
 func IsTest() bool {
-	return GetInfo().EnvType == Test
+	return GetInfo().envType == Test
 }
 
 // IsProd is production environment
 func IsProd() bool {
-	return GetInfo().EnvType == Prod
+	return GetInfo().envType == Prod
 }
 
 // IsDocker is docker environment
 func IsDocker() bool {
-	return GetInfo().EnvType == Docker
+	return GetInfo().envType == Docker
 }
 
 // IsK8s is k8s environment
 func IsK8s() bool {
-	return GetInfo().EnvType == K8s
+	return GetInfo().envType == K8s
 }
 
 // TypeString returns the string representation of the environment type.
-func (e *Info) TypeString() string {
-	return Type2String(e.EnvType)
+func (e *info) TypeString() string {
+	return Type2String(e.envType)
 }
 
 // Type2String returns the string representation of the given environment type.
@@ -110,7 +110,13 @@ func Type2String(t Env) string {
 
 // AppRootPath return the context path
 func AppRootPath() string {
-	return GetInfo().AppRootPath
+	return GetInfo().appRootPath
+}
+
+// SetAppRootPath set the app root path
+func SetAppRootPath(path string) {
+	envInfo := GetInfo()
+	envInfo.appRootPath = path
 }
 
 // Init initializes the environment information.
@@ -126,13 +132,13 @@ func Init() error {
 		if gErr != nil {
 			return
 		}
-		env.EnvType = Env(mode)
+		env.envType = Env(mode)
 		var appAbsPath string
 		appAbsPath, gErr = getAppAbsPath()
 		if gErr != nil {
 			return
 		}
-		env.AppRootPath = appAbsPath
+		env.appRootPath = appAbsPath
 	})
 	return gErr
 }
@@ -146,14 +152,14 @@ func ensure() {
 // SetContextVal set env info's context value
 func SetContextVal(key any, value any) {
 	info := GetInfo()
-	parent := info.Context
-	info.Context = context.WithValue(parent, key, value)
+	parent := info.context
+	info.context = context.WithValue(parent, key, value)
 }
 
 // GetContextVal get env info's context value by key
 func GetContextVal(key any) any {
 	info := GetInfo()
-	ctx := info.Context
+	ctx := info.context
 	return ctx.Value(key)
 }
 
@@ -168,7 +174,7 @@ func getAppAbsPath() (string, error) {
 	// judge if is test debugging
 	tempDir, _ := getTempDir()
 	if strings.Contains(root, tempDir) {
-		env.EnvType = Local
+		env.envType = Local
 		root, gErr = os.Getwd()
 		if gErr != nil {
 			return root, gErr
