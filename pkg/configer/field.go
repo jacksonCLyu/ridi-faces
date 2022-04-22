@@ -58,6 +58,44 @@ const (
 	FieldTypeSection
 )
 
+// String returns the string representation of the field.
+func (t FieldType) String() string {
+	switch t {
+	case FieldTypeString:
+		return "string"
+	case FieldTypeStringSlice:
+		return "string slice"
+	case FieldTypeInt:
+		return "int"
+	case FieldTypeIntSlice:
+		return "int slice"
+	case FieldTypeInt32:
+		return "int32"
+	case FieldTypeInt64:
+		return "int64"
+	case FieldTypeUint:
+		return "uint"
+	case FieldTypeUint32:
+		return "uint32"
+	case FieldTypeUint64:
+		return "uint64"
+	case FieldTypeBool:
+		return "bool"
+	case FieldTypeFloat32:
+		return "float32"
+	case FieldTypeFloat64:
+		return "float64"
+	case FieldTypeDuration:
+		return "duration"
+	case FieldTypeTime:
+		return "time"
+	case FieldTypeSection:
+		return "section"
+	default:
+		return "unknown"
+	}
+}
+
 // Field is a configuration field.
 type Field struct {
 	Type  FieldType
