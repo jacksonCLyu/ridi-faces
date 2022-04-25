@@ -1,6 +1,7 @@
 package configer
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -151,10 +152,16 @@ func Atof(value any) Field {
 		return Field{Type: FieldTypeDuration, Value: value}
 	case time.Time:
 		return Field{Type: FieldTypeTime, Value: value}
-	case map[string]interface{}:
+	case map[string]any:
 		subMap := make(map[string]Field)
 		for key, value := range value {
 			subMap[key] = Atof(value)
+		}
+		return Field{Type: FieldTypeSection, Value: subMap}
+	case map[any]any:
+		subMap := make(map[string]Field)
+		for key, value := range value {
+			subMap[fmt.Sprint(key)] = Atof(value)
 		}
 		return Field{Type: FieldTypeSection, Value: subMap}
 	default:
