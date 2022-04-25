@@ -117,33 +117,24 @@ func Atof(value any) Field {
 	case []bool:
 		return Field{Type: FieldTypeBoolSlice, Value: value}
 	case int:
-		return Field{Type: FieldTypeInt, Value: value}
-	case []int:
-		return Field{Type: FieldTypeIntSlice, Value: value}
 	case int32:
-		return Field{Type: FieldTypeInt32, Value: value}
-	case []int32:
-		return Field{Type: FieldTypeInt32Slice, Value: value}
 	case int64:
 		return Field{Type: FieldTypeInt64, Value: value}
+	case []int:
+	case []int32:
 	case []int64:
 		return Field{Type: FieldTypeInt64Slice, Value: value}
 	case uint:
-		return Field{Type: FieldTypeUint, Value: value}
-	case []uint:
-		return Field{Type: FieldTypeUintSlice, Value: value}
 	case uint32:
-		return Field{Type: FieldTypeUint32, Value: value}
-	case []uint32:
-		return Field{Type: FieldTypeUint32Slice, Value: value}
 	case uint64:
 		return Field{Type: FieldTypeUint64, Value: value}
+	case []uint:
+	case []uint32:
 	case []uint64:
 		return Field{Type: FieldTypeUint64Slice, Value: value}
-	case float32:
-		return Field{Type: FieldTypeFloat32, Value: value}
 	case []float32:
 		return Field{Type: FieldTypeFloat32Slice, Value: value}
+	case float32:
 	case float64:
 		return Field{Type: FieldTypeFloat64, Value: value}
 	case []float64:
