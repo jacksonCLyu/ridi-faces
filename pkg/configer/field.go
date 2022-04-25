@@ -50,8 +50,6 @@ func (t FieldType) String() string {
 		return "int slice"
 	case FieldTypeInt:
 		return "int"
-	case FieldTypeUint:
-		return "uint"
 	case FieldTypeUintSlice:
 		return "uint slice"
 	case FieldTypeBool:
@@ -92,12 +90,10 @@ func Atof(value any) Field {
 		return Field{Type: FieldTypeBool, Value: value}
 	case []bool:
 		return Field{Type: FieldTypeBoolSlice, Value: value}
-	case int, int32, int64:
+	case uint, uint32, uint64, int, int32, int64:
 		return Field{Type: FieldTypeInt, Value: value}
 	case []int, []int32, []int64:
 		return Field{Type: FieldTypeIntSlice, Value: value}
-	case uint, uint32, uint64:
-		return Field{Type: FieldTypeUint, Value: value}
 	case []uint, []uint32, []uint64:
 		return Field{Type: FieldTypeUintSlice, Value: value}
 	case float32, float64:
