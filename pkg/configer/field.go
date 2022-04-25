@@ -20,10 +20,6 @@ const (
 	// FieldTypeIntSlice is a field type for a slice of integers.
 	FieldTypeIntSlice
 	// FieldTypeUint is a field type for an unsigned integer.
-	FieldTypeUint
-	// FieldTypeUintSlice is a field type for a slice of unsigned integers.
-	FieldTypeUintSlice
-	// FieldTypeBool is a field type for a bool.
 	FieldTypeBool
 	// FieldTypeBoolSlice is a field type for a slice of bools.
 	FieldTypeBoolSlice
@@ -50,8 +46,6 @@ func (t FieldType) String() string {
 		return "int slice"
 	case FieldTypeInt:
 		return "int"
-	case FieldTypeUintSlice:
-		return "uint slice"
 	case FieldTypeBool:
 		return "bool"
 	case FieldTypeBoolSlice:
@@ -92,10 +86,8 @@ func Atof(value any) Field {
 		return Field{Type: FieldTypeBoolSlice, Value: value}
 	case uint, uint32, uint64, int, int32, int64:
 		return Field{Type: FieldTypeInt, Value: value}
-	case []int, []int32, []int64:
+	case []uint, []uint32, []uint64, []int, []int32, []int64:
 		return Field{Type: FieldTypeIntSlice, Value: value}
-	case []uint, []uint32, []uint64:
-		return Field{Type: FieldTypeUintSlice, Value: value}
 	case float32, float64:
 		return Field{Type: FieldTypeFloat, Value: value}
 	case []float32, []float64:
