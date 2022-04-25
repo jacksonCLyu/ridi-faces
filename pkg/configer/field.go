@@ -19,38 +19,18 @@ const (
 	FieldTypeInt
 	// FieldTypeIntSlice is a field type for a slice of integers.
 	FieldTypeIntSlice
-	// FieldTypeInt32 is a field type for an integer.
-	FieldTypeInt32
-	// FieldTypeInt32Slice is a field type for a slice of integers.
-	FieldTypeInt32Slice
-	// FieldTypeInt64 is a field type for an integer.
-	FieldTypeInt64
-	// FieldTypeInt64Slice is a field type for a slice of integers.
-	FieldTypeInt64Slice
 	// FieldTypeUint is a field type for an unsigned integer.
 	FieldTypeUint
 	// FieldTypeUintSlice is a field type for a slice of unsigned integers.
 	FieldTypeUintSlice
-	// FieldTypeUint32 is a field type for an unsigned integer.
-	FieldTypeUint32
-	// FieldTypeUint32Slice is a field type for a slice of unsigned integers.
-	FieldTypeUint32Slice
-	// FieldTypeUint64 is a field type for an unsigned integer.
-	FieldTypeUint64
-	// FieldTypeUint64Slice is a field type for a slice of unsigned integers.
-	FieldTypeUint64Slice
 	// FieldTypeBool is a field type for a bool.
 	FieldTypeBool
 	// FieldTypeBoolSlice is a field type for a slice of bools.
 	FieldTypeBoolSlice
-	// FieldTypeFloat32 is a field type for a float.
-	FieldTypeFloat32
-	// FieldTypeFloat32Slice is a field type for a slice of floats.
-	FieldTypeFloat32Slice
-	// FieldTypeFloat64 is a field type for a float.
-	FieldTypeFloat64
-	// FieldTypeFloat64Slice is a field type for a slice of floats.
-	FieldTypeFloat64Slice
+	// FieldTypeFloat is a field type for a float.
+	FieldTypeFloat
+	// FieldTypeFloatSlice is a field type for a slice of floats.
+	FieldTypeFloatSlice
 	// FieldTypeDuration is a field type for a duration.
 	FieldTypeDuration
 	// FieldTypeTime is a field type for a time.
@@ -67,30 +47,20 @@ func (t FieldType) String() string {
 	case FieldTypeStringSlice:
 		return "string slice"
 	case FieldTypeIntSlice:
-	case FieldTypeInt32Slice:
-	case FieldTypeInt64Slice:
 		return "int slice"
 	case FieldTypeInt:
-	case FieldTypeInt32:
-	case FieldTypeInt64:
 		return "int"
 	case FieldTypeUint:
-	case FieldTypeUint32:
-	case FieldTypeUint64:
 		return "uint"
 	case FieldTypeUintSlice:
-	case FieldTypeUint32Slice:
-	case FieldTypeUint64Slice:
 		return "uint slice"
 	case FieldTypeBool:
 		return "bool"
 	case FieldTypeBoolSlice:
 		return "bool slice"
-	case FieldTypeFloat32:
-	case FieldTypeFloat64:
+	case FieldTypeFloat:
 		return "float"
-	case FieldTypeFloat32Slice:
-	case FieldTypeFloat64Slice:
+	case FieldTypeFloatSlice:
 		return "float slice"
 	case FieldTypeDuration:
 		return "duration"
@@ -125,26 +95,26 @@ func Atof(value any) Field {
 	case int:
 	case int32:
 	case int64:
-		return Field{Type: FieldTypeInt64, Value: value}
+		return Field{Type: FieldTypeInt, Value: value}
 	case []int:
 	case []int32:
 	case []int64:
-		return Field{Type: FieldTypeInt64Slice, Value: value}
+		return Field{Type: FieldTypeIntSlice, Value: value}
 	case uint:
 	case uint32:
 	case uint64:
-		return Field{Type: FieldTypeUint64, Value: value}
+		return Field{Type: FieldTypeUint, Value: value}
 	case []uint:
 	case []uint32:
 	case []uint64:
-		return Field{Type: FieldTypeUint64Slice, Value: value}
-	case []float32:
-		return Field{Type: FieldTypeFloat32Slice, Value: value}
+		return Field{Type: FieldTypeUintSlice, Value: value}
 	case float32:
 	case float64:
-		return Field{Type: FieldTypeFloat64, Value: value}
+		return Field{Type: FieldTypeFloat, Value: value}
+	case []float32:
+		return Field{Type: FieldTypeFloatSlice, Value: value}
 	case []float64:
-		return Field{Type: FieldTypeFloat64Slice, Value: value}
+		return Field{Type: FieldTypeFloatSlice, Value: value}
 	case time.Duration:
 		return Field{Type: FieldTypeDuration, Value: value}
 	case time.Time:
