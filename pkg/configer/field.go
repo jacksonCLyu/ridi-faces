@@ -66,26 +66,32 @@ func (t FieldType) String() string {
 		return "string"
 	case FieldTypeStringSlice:
 		return "string slice"
-	case FieldTypeInt:
-		return "int"
 	case FieldTypeIntSlice:
+	case FieldTypeInt32Slice:
+	case FieldTypeInt64Slice:
 		return "int slice"
+	case FieldTypeInt:
 	case FieldTypeInt32:
-		return "int32"
 	case FieldTypeInt64:
-		return "int64"
+		return "int"
 	case FieldTypeUint:
-		return "uint"
 	case FieldTypeUint32:
-		return "uint32"
 	case FieldTypeUint64:
-		return "uint64"
+		return "uint"
+	case FieldTypeUintSlice:
+	case FieldTypeUint32Slice:
+	case FieldTypeUint64Slice:
+		return "uint slice"
 	case FieldTypeBool:
 		return "bool"
+	case FieldTypeBoolSlice:
+		return "bool slice"
 	case FieldTypeFloat32:
-		return "float32"
 	case FieldTypeFloat64:
-		return "float64"
+		return "float"
+	case FieldTypeFloat32Slice:
+	case FieldTypeFloat64Slice:
+		return "float slice"
 	case FieldTypeDuration:
 		return "duration"
 	case FieldTypeTime:
