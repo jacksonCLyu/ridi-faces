@@ -79,7 +79,7 @@ func Atof(value any) Field {
 	}
 	vv := reflect.ValueOf(value)
 	vtk := vv.Kind()
-	if (vtk == reflect.Interface || vtk == reflect.Ptr)&& !vv.IsNil() {
+	if (vtk == reflect.Interface || vtk == reflect.Ptr) && !vv.IsNil() {
 		vv = vv.Elem()
 		vtk = vv.Kind()
 	}
@@ -89,11 +89,51 @@ func Atof(value any) Field {
 	case reflect.Bool:
 		return Field{Type: FieldTypeBool, Value: value}
 	case reflect.Slice:
-		etm := vv.Type().Elem()
+		// slice type
+		vvt := vv.Type()
+		// slice element type
+		etm := vvt.Elem()
+		// slice element kind
 		etk := etm.Kind()
-		if etk == reflect.Interface {
-			etm = etm.Elem()
-			etk = etm.Kind()
+		if etk == reflect.Interface || etk == reflect.Ptr {
+			// if slice element type is interface, get the type of the interface, and convert element to that type
+			sliceLen := vv.Len()
+			elv := vv.Index(0).Elem()
+			elk := elv.Kind()
+			if elk == reflect.String {
+				slice := make([]string, sliceLen)
+				for i := 0; i < sliceLen; i++ {
+					slice[i] = vv.Index(i).Elem().String()
+				}
+				return Field{Type: FieldTypeStringSlice, Value: slice}
+			}
+			if elk == reflect.Bool {
+				slice := make([]bool, sliceLen)
+				for i := 0; i < sliceLen; i++ {
+					slice[i] = vv.Index(i).Elem().Bool()
+				}
+				return Field{Type: FieldTypeBoolSlice, Value: slice}
+			}
+			if elk == reflect.Int || etk == reflect.Int8 || etk == reflect.Int16 || etk == reflect.Int32 || etk == reflect.Int64 || etk == reflect.Uint || etk == reflect.Uint8 || etk == reflect.Uint16 || etk == reflect.Uint32 || etk == reflect.Uint64 || etk == reflect.Uintptr {
+				slice := make([]int64, sliceLen)
+				for i := 0; i < sliceLen; i++ {
+					slice[i] = vv.Index(i).Elem().Int()
+				}
+				return Field{Type: FieldTypeIntSlice, Value: slice}
+			}
+			if etk == reflect.Float32 || elk == reflect.Float64 {
+				slice := make([]float64, sliceLen)
+				for i := 0; i < sliceLen; i++ {
+					slice[i] = vv.Index(i).Elem().Float()
+				}
+				return Field{Type: FieldTypeFloatSlice, Value: slice}
+			} else {
+				slice := make([]any, sliceLen)
+				for i := 0; i < sliceLen; i++ {
+					slice[i] = vv.Index(i).Interface()
+				}
+				return Field{Type: FiledTypeUnknown, Value: slice}
+			}
 		}
 		if etk == reflect.String {
 			return Field{Type: FieldTypeStringSlice, Value: value}
@@ -101,7 +141,7 @@ func Atof(value any) Field {
 		if etk == reflect.Bool {
 			return Field{Type: FieldTypeBoolSlice, Value: value}
 		}
-		if etk == reflect.Int || etk == reflect.Int8 || etk == reflect.Int16 || etk == reflect.Int32 || etk == reflect.Int64 || etk == reflect.Uint || etk == reflect.Uint8 || etk == reflect.Uint16 || etk == reflect.Uint32 || etk == reflect.Uint64 || etk == reflect.Uintptr{
+		if etk == reflect.Int || etk == reflect.Int8 || etk == reflect.Int16 || etk == reflect.Int32 || etk == reflect.Int64 || etk == reflect.Uint || etk == reflect.Uint8 || etk == reflect.Uint16 || etk == reflect.Uint32 || etk == reflect.Uint64 || etk == reflect.Uintptr {
 			return Field{Type: FieldTypeIntSlice, Value: value}
 		}
 		if etk == reflect.Float32 || etk == reflect.Float64 {
