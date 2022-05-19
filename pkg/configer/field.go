@@ -99,7 +99,8 @@ func Atof(value any) Field {
 		etk := etm.Kind()
 		etv := reflect.ValueOf(etm)
 		if etk == reflect.Interface && !etv.IsNil() {
-			etk = etv.Kind()
+			etvm := etv.Elem().Type()
+			etk = etvm.Kind()
 		}
 		if etk == reflect.String {
 			return Field{Type: FieldTypeStringSlice, Value: value}
