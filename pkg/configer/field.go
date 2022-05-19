@@ -2,6 +2,7 @@ package configer
 
 import (
 	"fmt"
+	"reflect"
 	"time"
 )
 
@@ -73,42 +74,91 @@ type Field struct {
 
 // Atof convert any to Field
 func Atof(value any) Field {
-	switch value := value.(type) {
-	case Field:
-		return value
-	case string:
+	typeOf := reflect.TypeOf(value)
+	if typeOf == nil {
+		return Field{Type: FiledTypeUnknown, Value: value}
+	}
+	if typeOf.Kind() == reflect.Ptr {
+		typeOf = typeOf.Elem()
+	}
+	switch typeOf.Kind() {
+	case reflect.String:
 		return Field{Type: FieldTypeString, Value: value}
-	case []string:
-		return Field{Type: FieldTypeStringSlice, Value: value}
-	case bool:
-		return Field{Type: FieldTypeBool, Value: value}
-	case []bool:
-		return Field{Type: FieldTypeBoolSlice, Value: value}
-	case uint, uint32, uint64, int, int32, int64:
+	case reflect.Slice:
+		if typeOf.Elem().Kind() == reflect.String {
+			return Field{Type: FieldTypeStringSlice, Value: value}
+		}
+		if typeOf.Elem().Kind() == reflect.Int {
+			return Field{Type: FieldTypeIntSlice, Value: value}
+		}
+		if typeOf.Elem().Kind() == reflect.Bool {
+			return Field{Type: FieldTypeBoolSlice, Value: value}
+		}
+		if typeOf.Elem().Kind() == reflect.Float64 {
+			return Field{Type: FieldTypeFloatSlice, Value: value}
+		}
+		if typeOf.Elem().Kind() == reflect.Struct {
+			return Field{Type: FieldTypeSection, Value: value}
+		}
+		return Field{Type: FiledTypeUnknown, Value: value}
+	case reflect.Int:
 		return Field{Type: FieldTypeInt, Value: value}
-	case []uint, []uint32, []uint64, []int, []int32, []int64:
-		return Field{Type: FieldTypeIntSlice, Value: value}
-	case float32, float64:
+	case reflect.Bool:
+		return Field{Type: FieldTypeBool, Value: value}
+	case reflect.Float64:
 		return Field{Type: FieldTypeFloat, Value: value}
-	case []float32, []float64:
-		return Field{Type: FieldTypeFloatSlice, Value: value}
-	case time.Duration:
+	case reflect.Struct:
+		return Field{Type: FieldTypeSection, Value: value}
+	case reflect.Map:
+		vMap := value.(map[any]any)
+		subMap := make(map[string]Field, len(vMap))
+		for k, v := range vMap {
+			subMap[fmt.Sprint(k)] = Atof(v)
+		}
+		return Field{Type: FieldTypeSection, Value: subMap}
+	case reflect.TypeOf(time.Duration(0)).Kind():
 		return Field{Type: FieldTypeDuration, Value: value}
-	case time.Time:
+	case reflect.TypeOf(time.Now()).Kind():
 		return Field{Type: FieldTypeTime, Value: value}
-	case map[string]any:
-		subMap := make(map[string]Field)
-		for key, value := range value {
-			subMap[key] = Atof(value)
-		}
-		return Field{Type: FieldTypeSection, Value: subMap}
-	case map[any]any:
-		subMap := make(map[string]Field)
-		for key, value := range value {
-			subMap[fmt.Sprint(key)] = Atof(value)
-		}
-		return Field{Type: FieldTypeSection, Value: subMap}
 	default:
 		return Field{Type: FiledTypeUnknown, Value: value}
 	}
+	//switch value := value.(type) {
+	//case Field:
+	//	return value
+	//case string:
+	//	return Field{Type: FieldTypeString, Value: value}
+	//case []string:
+	//	return Field{Type: FieldTypeStringSlice, Value: value}
+	//case bool:
+	//	return Field{Type: FieldTypeBool, Value: value}
+	//case []bool:
+	//	return Field{Type: FieldTypeBoolSlice, Value: value}
+	//case uint, uint32, uint64, int, int32, int64:
+	//	return Field{Type: FieldTypeInt, Value: value}
+	//case []uint, []uint32, []uint64, []int, []int32, []int64:
+	//	return Field{Type: FieldTypeIntSlice, Value: value}
+	//case float32, float64:
+	//	return Field{Type: FieldTypeFloat, Value: value}
+	//case []float32, []float64:
+	//	return Field{Type: FieldTypeFloatSlice, Value: value}
+	//case time.Duration:
+	//	return Field{Type: FieldTypeDuration, Value: value}
+	//case time.Time:
+	//	return Field{Type: FieldTypeTime, Value: value}
+	//case map[string]any:
+	//	subMap := make(map[string]Field)
+	//	for key, value := range value {
+	//		subMap[key] = Atof(value)
+	//	}
+	//	return Field{Type: FieldTypeSection, Value: subMap}
+	//case map[any]any:
+	//	subMap := make(map[string]Field)
+	//	for key, value := range value {
+	//		subMap[fmt.Sprint(key)] = Atof(value)
+	//	}
+	//	return Field{Type: FieldTypeSection, Value: subMap}
+	//default:
+	//	return Field{Type: FiledTypeUnknown, Value: value}
+	//}
 }
