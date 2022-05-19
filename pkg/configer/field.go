@@ -74,15 +74,12 @@ type Field struct {
 
 // Atof convert any to Field
 func Atof(value any) Field {
-	vv := reflect.ValueOf(value)
-	if vv.IsNil() {
-		return Field{ // nil
-			Type:  FiledTypeUnknown,
-			Value: nil,
-		}
+	if reflect.TypeOf(value) == nil {
+		return Field{Type: FiledTypeUnknown, Value: value}
 	}
+	vv := reflect.ValueOf(value)
 	vtk := vv.Kind()
-	if vtk == reflect.Interface {
+	if (vtk == reflect.Interface || vtk == reflect.Ptr)&& !vv.IsNil() {
 		vv = vv.Elem()
 		vtk = vv.Kind()
 	}
