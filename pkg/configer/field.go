@@ -95,10 +95,12 @@ func Atof(value any) Field {
 	case reflect.Bool:
 		return Field{Type: FieldTypeBool, Value: value}
 	case reflect.Slice:
-		etk := typeOf.Elem().Kind()
-		etv := reflect.ValueOf(typeOf.Elem())
+		etm := typeOf.Elem()
+		etk := etm.Kind()
+		etv := reflect.ValueOf(etm)
 		if etk == reflect.Interface && !etv.IsNil() {
-			etk = etv.Elem().Kind()
+			etvm := etv.Elem()
+			etk = etvm.Kind()
 		}
 		if etk == reflect.String {
 			return Field{Type: FieldTypeStringSlice, Value: value}
