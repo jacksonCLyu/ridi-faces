@@ -77,83 +77,64 @@ func Atof(value any) Field {
 	if reflect.TypeOf(value) == nil {
 		return Field{Type: FiledTypeUnknown, Value: value}
 	}
-	vv := reflect.ValueOf(value)
-	vtk := vv.Kind()
-	if (vtk == reflect.Interface || vtk == reflect.Ptr) && !vv.IsNil() {
-		vv = vv.Elem()
-		vtk = vv.Kind()
+	valueOf := reflect.ValueOf(value)
+	valueKind := valueOf.Kind()
+	if (valueKind == reflect.Interface || valueKind == reflect.Ptr) && !valueOf.IsNil() {
+		valueOf = valueOf.Elem()
+		valueKind = valueOf.Kind()
 	}
-	switch vtk {
+	switch valueKind {
 	case reflect.String:
-		return Field{Type: FieldTypeString, Value: value}
+		return Field{Type: FieldTypeString, Value: valueOf.String()}
 	case reflect.Bool:
-		return Field{Type: FieldTypeBool, Value: value}
+		return Field{Type: FieldTypeBool, Value: valueOf.Bool()}
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+		return Field{Type: FieldTypeInt, Value: valueOf.Int()}
+	case reflect.Float32, reflect.Float64:
+		return Field{Type: FieldTypeFloat, Value: valueOf.Float()}
 	case reflect.Slice:
+		// slice length
+		sliceLen := valueOf.Len()
 		// slice type
-		vvt := vv.Type()
+		vvt := valueOf.Type()
 		// slice element type
 		etm := vvt.Elem()
 		// slice element kind
 		etk := etm.Kind()
 		if etk == reflect.Interface || etk == reflect.Ptr {
-			// if slice element type is interface, get the type of the interface, and convert element to that type
-			sliceLen := vv.Len()
-			elv := vv.Index(0).Elem()
-			elk := elv.Kind()
-			if elk == reflect.String {
-				slice := make([]string, sliceLen)
-				for i := 0; i < sliceLen; i++ {
-					slice[i] = vv.Index(i).Elem().String()
-				}
-				return Field{Type: FieldTypeStringSlice, Value: slice}
-			}
-			if elk == reflect.Bool {
-				slice := make([]bool, sliceLen)
-				for i := 0; i < sliceLen; i++ {
-					slice[i] = vv.Index(i).Elem().Bool()
-				}
-				return Field{Type: FieldTypeBoolSlice, Value: slice}
-			}
-			if elk == reflect.Int || etk == reflect.Int8 || etk == reflect.Int16 || etk == reflect.Int32 || etk == reflect.Int64 || etk == reflect.Uint || etk == reflect.Uint8 || etk == reflect.Uint16 || etk == reflect.Uint32 || etk == reflect.Uint64 || etk == reflect.Uintptr {
-				slice := make([]int64, sliceLen)
-				for i := 0; i < sliceLen; i++ {
-					slice[i] = vv.Index(i).Elem().Int()
-				}
-				return Field{Type: FieldTypeIntSlice, Value: slice}
-			}
-			if etk == reflect.Float32 || elk == reflect.Float64 {
-				slice := make([]float64, sliceLen)
-				for i := 0; i < sliceLen; i++ {
-					slice[i] = vv.Index(i).Elem().Float()
-				}
-				return Field{Type: FieldTypeFloatSlice, Value: slice}
-			} else {
-				slice := make([]any, sliceLen)
-				for i := 0; i < sliceLen; i++ {
-					slice[i] = vv.Index(i).Interface()
-				}
-				return Field{Type: FiledTypeUnknown, Value: slice}
-			}
+			// if slice element type is interface or pointer, get the type of the interface or pointer
+			elv := valueOf.Index(0).Elem()
+			etk = elv.Kind()
 		}
 		if etk == reflect.String {
-			return Field{Type: FieldTypeStringSlice, Value: value}
+			slice := make([]string, sliceLen)
+			for i := 0; i < sliceLen; i++ {
+				slice[i] = valueOf.Index(i).Elem().String()
+			}
+			return Field{Type: FieldTypeStringSlice, Value: slice}
 		}
 		if etk == reflect.Bool {
-			return Field{Type: FieldTypeBoolSlice, Value: value}
+			slice := make([]bool, sliceLen)
+			for i := 0; i < sliceLen; i++ {
+				slice[i] = valueOf.Index(i).Elem().Bool()
+			}
+			return Field{Type: FieldTypeBoolSlice, Value: slice}
 		}
 		if etk == reflect.Int || etk == reflect.Int8 || etk == reflect.Int16 || etk == reflect.Int32 || etk == reflect.Int64 || etk == reflect.Uint || etk == reflect.Uint8 || etk == reflect.Uint16 || etk == reflect.Uint32 || etk == reflect.Uint64 || etk == reflect.Uintptr {
-			return Field{Type: FieldTypeIntSlice, Value: value}
+			slice := make([]int64, sliceLen)
+			for i := 0; i < sliceLen; i++ {
+				slice[i] = valueOf.Index(i).Elem().Int()
+			}
+			return Field{Type: FieldTypeIntSlice, Value: slice}
 		}
 		if etk == reflect.Float32 || etk == reflect.Float64 {
-			return Field{Type: FieldTypeFloatSlice, Value: value}
+			slice := make([]float64, sliceLen)
+			for i := 0; i < sliceLen; i++ {
+				slice[i] = valueOf.Index(i).Elem().Float()
+			}
+			return Field{Type: FieldTypeFloatSlice, Value: slice}
 		}
 		return Field{Type: FiledTypeUnknown, Value: value}
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
-		return Field{Type: FieldTypeInt, Value: value}
-	case reflect.Float32, reflect.Float64:
-		return Field{Type: FieldTypeFloat, Value: value}
-	case reflect.Struct:
-		return Field{Type: FieldTypeSection, Value: value}
 	case reflect.Map:
 		vMap := value.(map[any]any)
 		subMap := make(map[string]Field, len(vMap))
@@ -168,42 +149,4 @@ func Atof(value any) Field {
 	default:
 		return Field{Type: FiledTypeUnknown, Value: value}
 	}
-	//switch value := value.(type) {
-	//case Field:
-	//	return value
-	//case string:
-	//	return Field{Type: FieldTypeString, Value: value}
-	//case []string:
-	//	return Field{Type: FieldTypeStringSlice, Value: value}
-	//case bool:
-	//	return Field{Type: FieldTypeBool, Value: value}
-	//case []bool:
-	//	return Field{Type: FieldTypeBoolSlice, Value: value}
-	//case uint, uint32, uint64, int, int32, int64:
-	//	return Field{Type: FieldTypeInt, Value: value}
-	//case []uint, []uint32, []uint64, []int, []int32, []int64:
-	//	return Field{Type: FieldTypeIntSlice, Value: value}
-	//case float32, float64:
-	//	return Field{Type: FieldTypeFloat, Value: value}
-	//case []float32, []float64:
-	//	return Field{Type: FieldTypeFloatSlice, Value: value}
-	//case time.Duration:
-	//	return Field{Type: FieldTypeDuration, Value: value}
-	//case time.Time:
-	//	return Field{Type: FieldTypeTime, Value: value}
-	//case map[string]any:
-	//	subMap := make(map[string]Field)
-	//	for key, value := range value {
-	//		subMap[key] = Atof(value)
-	//	}
-	//	return Field{Type: FieldTypeSection, Value: subMap}
-	//case map[any]any:
-	//	subMap := make(map[string]Field)
-	//	for key, value := range value {
-	//		subMap[fmt.Sprint(key)] = Atof(value)
-	//	}
-	//	return Field{Type: FieldTypeSection, Value: subMap}
-	//default:
-	//	return Field{Type: FiledTypeUnknown, Value: value}
-	//}
 }
