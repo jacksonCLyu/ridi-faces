@@ -84,28 +84,29 @@ func Atof(value any) Field {
 	switch typeOf.Kind() {
 	case reflect.String:
 		return Field{Type: FieldTypeString, Value: value}
+	case reflect.Bool:
+		return Field{Type: FieldTypeBool, Value: value}
 	case reflect.Slice:
-		if typeOf.Elem().Kind() == reflect.String {
+		tek := typeOf.Elem().Kind()
+		if tek == reflect.String {
 			return Field{Type: FieldTypeStringSlice, Value: value}
 		}
-		if typeOf.Elem().Kind() == reflect.Int {
-			return Field{Type: FieldTypeIntSlice, Value: value}
-		}
-		if typeOf.Elem().Kind() == reflect.Bool {
+		if tek == reflect.Bool {
 			return Field{Type: FieldTypeBoolSlice, Value: value}
 		}
-		if typeOf.Elem().Kind() == reflect.Float64 {
+		if tek == reflect.Int || tek == reflect.Int8 || tek == reflect.Int16 || tek == reflect.Int32 || tek == reflect.Int64 || tek == reflect.Uint || tek == reflect.Uint8 || tek == reflect.Uint16 || tek == reflect.Uint32 || tek == reflect.Uint64 || tek == reflect.Uintptr{
+			return Field{Type: FieldTypeIntSlice, Value: value}
+		}
+		if tek == reflect.Float32 || tek == reflect.Float64 {
 			return Field{Type: FieldTypeFloatSlice, Value: value}
 		}
-		if typeOf.Elem().Kind() == reflect.Struct {
+		if tek == reflect.Struct {
 			return Field{Type: FieldTypeSection, Value: value}
 		}
 		return Field{Type: FiledTypeUnknown, Value: value}
-	case reflect.Int:
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
 		return Field{Type: FieldTypeInt, Value: value}
-	case reflect.Bool:
-		return Field{Type: FieldTypeBool, Value: value}
-	case reflect.Float64:
+	case reflect.Float32, reflect.Float64:
 		return Field{Type: FieldTypeFloat, Value: value}
 	case reflect.Struct:
 		return Field{Type: FieldTypeSection, Value: value}
