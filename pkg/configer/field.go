@@ -74,20 +74,17 @@ type Field struct {
 
 // Atof convert any to Field
 func Atof(value any) Field {
-	typeOf := reflect.TypeOf(value)
-	if typeOf == nil {
-		return Field{Type: FiledTypeUnknown, Value: value}
-	}
-	vtk := typeOf.Kind()
-	if vtk == reflect.Ptr {
-		typeOf = typeOf.Elem()
-		vtk = typeOf.Kind()
-	}
 	vv := reflect.ValueOf(value)
-	if vtk == reflect.Interface && !vv.IsNil() {
+	if vv.IsNil() {
+		return Field{ // nil
+			Type:  FiledTypeUnknown,
+			Value: nil,
+		}
+	}
+	vtk := vv.Kind()
+	if vtk == reflect.Interface {
 		vv = vv.Elem()
-		typeOf = vv.Type()
-		vtk = typeOf.Kind()
+		vtk = vv.Kind()
 	}
 	switch vtk {
 	case reflect.String:
@@ -95,15 +92,11 @@ func Atof(value any) Field {
 	case reflect.Bool:
 		return Field{Type: FieldTypeBool, Value: value}
 	case reflect.Slice:
-		etm := typeOf.Elem()
+		etm := vv.Elem()
 		etk := etm.Kind()
-		if etk == reflect.Interface {
-			etv := reflect.ValueOf(etm)
-			etk = etv.Kind()
-			if etk == reflect.Ptr {
-				etv = etv.Elem()
-				etk = etv.Kind()
-			}
+		if etk == reflect.Interface || etk == reflect.Ptr {
+			etm = etm.Elem()
+			etk = etm.Kind()
 		}
 		if etk == reflect.String {
 			return Field{Type: FieldTypeStringSlice, Value: value}
@@ -116,9 +109,6 @@ func Atof(value any) Field {
 		}
 		if etk == reflect.Float32 || etk == reflect.Float64 {
 			return Field{Type: FieldTypeFloatSlice, Value: value}
-		}
-		if etk == reflect.Struct {
-			return Field{Type: FieldTypeSection, Value: value}
 		}
 		return Field{Type: FiledTypeUnknown, Value: value}
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
